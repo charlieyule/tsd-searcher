@@ -4,30 +4,41 @@ on:
   - push
   - pull_request
 
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
   cq:
     name: Code Quality
+    strategy:
+      matrix:
+        deno:
+          - v1.37.1
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.37.1
+          deno-version: ${{ matrix.deno }}
       - name: lint
         run: deno lint
+      - name: fmt
+        run: deno fmt --check
   validate:
     name: Validate
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        deno:
+          - v1.37.1
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macOS-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.37.1
+          deno-version: ${{ matrix.deno }}
       - name: Unit test
-        run: deno test
+        run: deno task test
 
   required:
     runs-on: ubuntu-latest
