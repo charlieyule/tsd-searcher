@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  - push
+  - pull_request
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  cq:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.37.1
+      - name: lint
+        run: deno lint
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.37.1
+      - name: Unit test
+        run: deno test
+
+  required:
+    runs-on: ubuntu-latest
+    name: Required
+    needs:
+      - cq
+      - validate
+    steps:
+      - run: echo All required jobs succeeded.
