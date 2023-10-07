@@ -1,6 +1,23 @@
 import { assert, assertEquals, assertFalse } from "std/assert/mod.ts";
-import { Candidate } from "./search.ts";
+import { Candidate, search } from "./search.ts";
 import { TSD } from "./tsd.ts";
+
+Deno.test("search", () => {
+  const seq = "AGTTTGAAGTACGATTAAAATTTTTCTTTTTCCGGATCCGAGTTTGATCTTC" +
+    "TTTAGAAACAAAAATTATATTTGTTTAGAAAGTCTGTCAGTTGGGTTTTGGC" +
+    "CCAATTGATTTACCTGGTAGTCAGAAATGTAAGTGACCTGACTACCCTTGAC" +
+    "ATTAGTCAGAAAACATTCTAAACTCGAGATAAACACTGTGGTAGTTCTTTAG" +
+    "AAAGAAGTCGACTCTAAAGTACTTTGGCGTAAAACAAAAAAATTTCCCTTGA" +
+    "AATTATACTTTATTTGTTTGACATAAA";
+
+  const tsds = search(seq);
+  assertEquals(tsds, [
+    new TSD("GTTTGAagTA", 1, 11, "GTTTGAcaTA", 275, 285, 6.4),
+    new TSD("AAGTACgaTT", 6, 16, "AAGTAC--TT", 224, 232, 6.4),
+    new TSD("TTT-TTc-TTT", 20, 29, "TTTaTTtgTTT", 268, 279, 5.818181818181818),
+    new TSD("TTTtcTTT-TT", 21, 31, "TTTa-TTTgTT", 268, 278, 5.818181818181818),
+  ]);
+});
 
 Deno.test("Candidate.isQualified", async (t) => {
   const candidate = new Candidate(
@@ -56,7 +73,7 @@ Deno.test("Candidate.toTSD", () => {
       "AA-CG-TT",
       13,
       19,
-      0.75,
+      4.5,
     ),
   );
 });

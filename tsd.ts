@@ -10,6 +10,11 @@ export class TSD {
   ) {
   }
 
+  public contains(other: TSD): boolean {
+    return this.leftStart <= other.leftStart && this.leftEnd >= other.leftEnd &&
+      this.rightStart <= other.rightStart && this.rightEnd >= other.rightEnd;
+  }
+
   public toString(): string {
     return `${this.leftSeq} (${this.leftStart}-${this.leftEnd}) ${this.rightSeq} (${this.rightStart}-${this.rightEnd})`;
   }

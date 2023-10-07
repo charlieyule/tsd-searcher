@@ -1,4 +1,127 @@
+import { sprintf } from "std/fmt/printf.ts";
+import { defaultOptions, Options } from "./options.ts";
 import { TSD } from "./tsd.ts";
+
+const BASES = String.raw`[ACGT]`;
+const PADDING_LENGTH = 6;
+const PADDING_CHAR = "#";
+const PADDING = PADDING_CHAR.repeat(PADDING_LENGTH);
+
+export function search(seq: string, options: Options = defaultOptions): TSD[] {
+  const mergedOptions = { ...defaultOptions, ...options };
+  const tsds: TSD[] = [];
+
+  const leftLeft = mergedOptions.leftOffset;
+  const leftRight = leftLeft + mergedOptions.leftRange;
+  const rightRight = seq.length - mergedOptions.rightOffset;
+  const rightLeft = rightRight - mergedOptions.rightRange;
+
+  const searchSeq = seq.substring(leftLeft, leftRight) + PADDING +
+    seq.substring(rightLeft, rightRight);
+
+  const spacer = sprintf(String.raw`${BASES}{0,${mergedOptions.sLen}}?`);
+  const leftRepeatsPattern = sprintf(
+    String.raw`(%[1]v{%[3]v,})` +
+      String.raw`(%[2]v)` +
+      String.raw`(%[1]v{%[4]v,})` +
+      String.raw`(%[2]v)` +
+      String.raw`(%[1]v{%[5]v,})`,
+    BASES,
+    spacer,
+    mergedOptions.r1Len,
+    mergedOptions.r2Len,
+    mergedOptions.r3Len,
+  );
+  const rightRepeatsPattern = sprintf(
+    String.raw`(\2)(%[1]v)(\4)(%[1]v)(\6)`,
+    spacer,
+  );
+  const spacerBetweenRepeats = sprintf(String.raw`${PADDING}`);
+
+  for (
+    let pos1 = 0;
+    pos1 <
+      mergedOptions.leftRange - mergedOptions.leftOffset -
+        mergedOptions.matchThr;
+    pos1++
+  ) {
+    let pos2 = 0;
+    const leftHeadPattern = String.raw`^(${BASES}{${pos1}})`;
+    const leftTailPattern = String.raw`${BASES}*`;
+    let rightHeadPattern = String.raw`(${BASES}{${pos2},})`;
+    const rightTailPattern = String.raw`${BASES}*$`;
+    let re = new RegExp(
+      leftHeadPattern + leftRepeatsPattern + leftTailPattern +
+        spacerBetweenRepeats +
+        rightHeadPattern + rightRepeatsPattern + rightTailPattern,
+      "i",
+    );
+    let match = re.exec(searchSeq);
+    while (match) {
+      const [
+        ,
+        leftHead,
+        leftR1,
+        leftS1,
+        leftR2,
+        leftS2,
+        leftR3,
+        rightHead,
+        rightR1,
+        rightS1,
+        rightR2,
+        rightS2,
+        rightR3,
+      ] = match;
+      const rLength = leftR1.length + leftR2.length + leftR3.length;
+      const localLeftStart = match.index + leftHead.length;
+      const localLeftEnd = localLeftStart + rLength + leftS1.length +
+        leftS2.length;
+      const localRightStart = rightHead.length;
+      const localRightEnd = rightHead.length + rLength + rightS1.length +
+        rightS2.length;
+      const candidate = new Candidate(
+        leftR1,
+        leftS1,
+        leftR2,
+        leftS2,
+        leftR3,
+        rightR1,
+        rightS1,
+        rightR2,
+        rightS2,
+        rightR3,
+        localLeftStart,
+        localLeftEnd,
+        localRightStart,
+        localRightEnd,
+      );
+      if (
+        !candidate.isQualified(
+          mergedOptions.matchThr,
+          mergedOptions.mismatchThr,
+        )
+      ) {
+        break;
+      }
+      const tsd = candidate.toTSD(leftLeft, rightLeft);
+      if (!tsds.find((other) => other.contains(tsd))) {
+        tsds.push(tsd);
+      }
+      pos2++;
+      rightHeadPattern = String.raw`(${BASES}{${pos2},})`;
+      re = new RegExp(
+        leftHeadPattern + leftRepeatsPattern + leftTailPattern +
+          spacerBetweenRepeats +
+          rightHeadPattern + rightRepeatsPattern + rightTailPattern,
+        "i",
+      );
+      match = re.exec(searchSeq);
+    }
+  }
+
+  return tsds;
+}
 
 export class Candidate {
   private static TSD_PADDING = "-";
@@ -48,7 +171,7 @@ export class Candidate {
       rightSeq,
       this.localRightStart + rightOffset,
       this.localRightEnd + rightOffset,
-      (this.leftR1.length + this.leftR2.length + this.leftR3.length) /
+      (this.leftR1.length + this.leftR2.length + this.leftR3.length) ** 2 /
         leftSeq.length,
     );
   }
