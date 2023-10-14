@@ -99,8 +99,10 @@ export class WorkerPool {
   /**
    * Close the worker pool.
    */
-  public close() {
+  public close(): Promise<void> {
     this.workers.forEach((worker) => worker.postMessage(close));
+    // sleep for a short while to let workers exit properly
+    return new Promise((resolve) => setTimeout(() => resolve(undefined), 100));
   }
 
   /**
@@ -109,7 +111,18 @@ export class WorkerPool {
   private setupWorkerListener(worker: Worker) {
     worker.onmessage = (e: MessageEvent<SearchResponse>) => {
       const { id, tsds } = e.data;
-      this.promiseResolves.get(id)?.(tsds);
+      this.promiseResolves.get(id)?.(tsds.map((tsd) =>
+        // re-construct TSD objects as the received from workers lose the prototypes.
+        new TSD(
+          tsd.leftSeq,
+          tsd.leftStart,
+          tsd.leftEnd,
+          tsd.rightSeq,
+          tsd.rightStart,
+          tsd.rightEnd,
+          tsd.score,
+        )
+      ));
       this.promiseResolves.delete(id);
     };
   }

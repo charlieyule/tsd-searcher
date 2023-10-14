@@ -1,11 +1,11 @@
 export class TSD {
   constructor(
-    private leftSeq: string,
-    private leftStart: number,
-    private leftEnd: number,
-    private rightSeq: string,
-    private rightStart: number,
-    private rightEnd: number,
+    public readonly leftSeq: string,
+    public readonly leftStart: number,
+    public readonly leftEnd: number,
+    public readonly rightSeq: string,
+    public readonly rightStart: number,
+    public readonly rightEnd: number,
     public readonly score: number,
   ) {
   }

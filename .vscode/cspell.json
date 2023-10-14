@@ -3,6 +3,7 @@
     "ACGT",
     "FASTA",
     "sprintf",
-    "tsds"
+    "tsds",
+    "workerpool"
   ]
 }
