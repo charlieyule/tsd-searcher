@@ -10,9 +10,10 @@ export { WorkerPool } from "./workerpool.ts";
 // Search TSDs from a readable stream of a FASTA file.
 export async function* searchFA(
   readable: ReadableStream<Uint8Array>,
+  workers?: number,
   options?: Options,
 ): AsyncIterable<{ seqId: string; tsds: TSD[] }> {
-  const workerPool = new WorkerPool();
+  const workerPool = new WorkerPool(undefined, { size: workers });
   const results = [];
   try {
     for await (const entry of (await readFA(readable))) {
