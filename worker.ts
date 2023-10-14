@@ -8,7 +8,7 @@ function start() {
     const request = message.data;
     switch (request.type) {
       case Type.Close: {
-        console.log(`[${self.name}]: received "close" request, closing myself`);
+        console.log(`[${self.name}]: received "close" request, worker closed`);
         self.close();
         break;
       }
