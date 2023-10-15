@@ -136,6 +136,9 @@ export function parseFlags(): Flags {
 
 // Validate flag values.
 function validateFlags(flags: Flags) {
+  if (flags.help) {
+    return;
+  }
   if (!flags.filepath) {
     helpAndExit("Input FASTA file is required");
   }
