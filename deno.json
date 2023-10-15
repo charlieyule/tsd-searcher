@@ -1,7 +1,8 @@
 {
   "tasks": {
     "dev": "deno run --watch main.ts",
-    "test": "deno test --allow-read --doc --parallel --coverage=cov_profile && deno coverage cov_profile"
+    "test": "deno test --allow-read --doc --parallel --coverage=cov_profile && deno coverage cov_profile",
+    "build": "deno compile --allow-read --allow-write --no-check -o build/tsd-searcher --include worker.ts main.ts"
   },
   "imports": {
     "std/": "https://deno.land/std@0.203.0/"

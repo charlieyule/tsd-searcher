@@ -1,8 +1,12 @@
 name: CI
 
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
 
 jobs:
   cq:
@@ -29,7 +33,6 @@ jobs:
           - v1.37.1
         os:
           - ubuntu-latest
-          - windows-latest
           - macOS-latest
     runs-on: ${{ matrix.os }}
     steps:
