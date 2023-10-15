@@ -1,5 +1,6 @@
 import { parse } from "std/flags/mod.ts";
 import { Options } from "./options.ts";
+import { extname } from "std/path/mod.ts";
 
 export type Flags = {
   help: boolean;
@@ -36,6 +37,15 @@ const flagArgs = new Set(
     "--mmt",
   ],
 );
+
+const faFileExtensions = [
+  ".fasta",
+  ".fna",
+  ".fa",
+  ".ffn",
+  ".faa",
+  ".frn",
+];
 
 export const HELP = `Usage: tsd-searcher <fasta_file> [options]
 
@@ -141,6 +151,11 @@ function validateFlags(flags: Flags) {
   }
   if (!flags.filepath) {
     helpAndExit("Input FASTA file is required");
+  }
+  if (!faFileExtensions.includes(extname(flags.filepath))) {
+    helpAndExit(
+      `Input file must be of FASTA format (with extension ${faFileExtensions})`,
+    );
   }
   if (!flags.output) {
     helpAndExit("Output file must be specified");
