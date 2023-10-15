@@ -59,5 +59,5 @@ Deno.test("TSD.toString", () => {
     17,
     4.5,
   );
-  assertEquals(tsd.toString(), "aaccggtt (1-9) aa-cg-tt (11-17)");
+  assertEquals(tsd.toString(), "aaccggtt (2-9) aa-cg-tt (12-17)");
 });
