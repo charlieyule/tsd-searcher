@@ -1,5 +1,5 @@
 import { parse } from "std/flags/mod.ts";
-import { Options } from "./options.ts";
+import { SearchOptions } from "./options.ts";
 import { extname } from "std/path/mod.ts";
 
 export type Flags = {
@@ -7,7 +7,8 @@ export type Flags = {
   filepath: string;
   output: string;
   workers: number;
-} & Required<Options>;
+  workerScheduler: "rr" | "fi";
+} & Required<SearchOptions>;
 
 const flagArgs = new Set(
   [
@@ -17,6 +18,7 @@ const flagArgs = new Set(
     "--output",
     "-w",
     "--workers",
+    "--worker-scheduler",
     "--lo",
     "--left-offset",
     "--lr",
@@ -59,6 +61,8 @@ Options:
       Output file name (default: ./out.txt)
   -w, --workers
       Number of workers to search TSD concurrently (default: number of CPU cores / 2)
+  --worker-scheduler
+      Worker scheduler "rr" (Round-robin) or "fi" (First-idle) (default: "fi")
   --lo, --left-offset
       Offset from 5' end (default: 0)
   --lr, --left-range
@@ -102,6 +106,7 @@ export function parseFlags(): Flags {
     default: {
       output: "out.txt",
       workers: navigator.hardwareConcurrency / 2,
+      "worker-scheduler": "fi",
       lo: 0,
       lr: 40,
       ro: 0,
@@ -129,6 +134,7 @@ export function parseFlags(): Flags {
     filepath: String(rawFlags._?.[0] ?? ""),
     output: String(rawFlags.output),
     workers: Number(rawFlags.workers),
+    workerScheduler: String(rawFlags["worker-scheduler"]) as "rr" | "fi",
     leftOffset: Number(rawFlags.lo),
     leftRange: Number(rawFlags.lr),
     rightOffset: Number(rawFlags.ro),
@@ -162,6 +168,9 @@ function validateFlags(flags: Flags) {
   }
   if (flags.workers <= 0 || !Number.isInteger(flags.workers)) {
     helpAndExit(`Number of workers must be positive integer`);
+  }
+  if (flags.workerScheduler != "rr" && flags.workerScheduler != "fi") {
+    helpAndExit(`Worker scheduler must be either "rr" or "fi"`);
   }
   if (flags.leftOffset < 0 || !Number.isInteger(flags.leftOffset)) {
     helpAndExit(`Left offset must be non-negative integer`);

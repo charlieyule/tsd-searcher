@@ -11,7 +11,7 @@ export const defaultOptions = {
   mismatchThr: 3,
 };
 
-export interface Options {
+export interface SearchOptions {
   leftOffset?: number;
   leftRange?: number;
   rightOffset?: number;
@@ -23,3 +23,8 @@ export interface Options {
   matchThr?: number;
   mismatchThr?: number;
 }
+
+export type WorkerPoolOptions = {
+  size?: number;
+  scheduler?: "rr" | "fi";
+};

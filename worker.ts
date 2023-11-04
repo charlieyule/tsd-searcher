@@ -1,8 +1,19 @@
-import { Request, SearchResponse, Type } from "./message.ts";
+import {
+  Request,
+  SearchResponse,
+  Status,
+  StatusResponse,
+  Type,
+} from "./message.ts";
 import { search } from "./search.ts";
 
 function start() {
   console.log(`[${self.name}]: worker started`);
+  const idleResponse: StatusResponse = {
+    type: Type.Status,
+    name: self.name,
+    status: Status.Idle,
+  };
 
   self.onmessage = (message: MessageEvent<Request>) => {
     const request = message.data;
@@ -18,8 +29,9 @@ function start() {
           `[${self.name}]: received "search" request, searching TSD for sequence ${id}`,
         );
         const tsds = search(seq, options);
-        const response: SearchResponse = { id, tsds };
-        self.postMessage(response);
+        const searchResponse: SearchResponse = { id, tsds, type: Type.Search };
+        self.postMessage(searchResponse);
+        self.postMessage(idleResponse);
         break;
       }
     }

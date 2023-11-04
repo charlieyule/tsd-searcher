@@ -58,7 +58,10 @@ if (import.meta.main) {
     for await (
       const { seqId, tsds } of await searchFA(
         input.readable,
-        Number(flags.workers),
+        {
+          size: flags.workers,
+          scheduler: flags.workerScheduler,
+        },
         flags,
       )
     ) {

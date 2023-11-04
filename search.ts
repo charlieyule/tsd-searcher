@@ -1,5 +1,5 @@
 import { sprintf } from "std/fmt/printf.ts";
-import { defaultOptions, Options } from "./options.ts";
+import { defaultOptions, SearchOptions } from "./options.ts";
 import { TSD } from "./tsd.ts";
 
 const BASES = String.raw`[ACGT]`;
@@ -7,7 +7,10 @@ const PADDING_LENGTH = 6;
 const PADDING_CHAR = "#";
 const PADDING = PADDING_CHAR.repeat(PADDING_LENGTH);
 
-export function search(seq: string, options: Options = defaultOptions): TSD[] {
+export function search(
+  seq: string,
+  options?: SearchOptions,
+): TSD[] {
   const mergedOptions = { ...defaultOptions, ...options };
   const tsds: TSD[] = [];
 
