@@ -9,6 +9,10 @@ This is a re-implementation of
 aiming to extract the non-Python dependency from AnnoSINE and make it easier to
 integrate.
 
+TSD Searcher takes advantage of multicore parallel processing by spawning
+multiple workers to accelerate the search. By default, the number of workers is
+half the number of CPU cores.
+
 ## Installation
 
 ### Download Pre-Build Binaries
@@ -44,6 +48,8 @@ Options:
       Output file name (default: ./out.txt)
   -w, --workers
       Number of workers to search TSD concurrently (default: number of CPU cores / 2)
+  --worker-scheduler
+      Worker scheduler "rr" (Round-robin) or "fi" (First-idle) (default: "fi")
   --lo, --left-offset
       Offset from 5' end (default: 0)
   --lr, --left-range

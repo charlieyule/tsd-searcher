@@ -3,6 +3,7 @@
     "ACGT",
     "Deno",
     "FASTA",
+    "multicore",
     "sprintf",
     "tsds",
     "workerpool"
