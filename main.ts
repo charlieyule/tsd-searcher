@@ -3,10 +3,17 @@ import { dirname } from "std/path/mod.ts";
 import { searchFA } from "./mod.ts";
 import { HELP, parseFlags } from "./flags.ts";
 
+const VERSION = "v0.2.0";
+
 if (import.meta.main) {
   const flags = parseFlags();
   if (flags.help) {
     console.log(HELP);
+    Deno.exit(0);
+  }
+
+  if (flags.version) {
+    console.log(VERSION);
     Deno.exit(0);
   }
 

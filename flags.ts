@@ -4,6 +4,7 @@ import { extname } from "std/path/mod.ts";
 
 export type Flags = {
   help: boolean;
+  version: boolean;
   filepath: string;
   output: string;
   workers: number;
@@ -14,6 +15,8 @@ const flagArgs = new Set(
   [
     "-h",
     "--help",
+    "-v",
+    "--version",
     "-o",
     "--output",
     "-w",
@@ -90,6 +93,7 @@ export function parseFlags(): Flags {
   const rawFlags = parse(Deno.args, {
     alias: {
       help: "h",
+      version: "v",
       output: "o",
       workers: "w",
       "left-offset": "lo",
@@ -118,7 +122,7 @@ export function parseFlags(): Flags {
       mt: 8,
       mmt: 3,
     },
-    boolean: ["help"],
+    boolean: ["help", "version"],
     unknown: (arg, key) => {
       if (key && !flagArgs.has(arg)) {
         console.log("invalid options:", arg, "\n");
@@ -131,6 +135,7 @@ export function parseFlags(): Flags {
 
   const flags: Flags = {
     help: rawFlags.help,
+    version: rawFlags.version,
     filepath: String(rawFlags._?.[0] ?? ""),
     output: String(rawFlags.output),
     workers: Number(rawFlags.workers),
@@ -153,6 +158,9 @@ export function parseFlags(): Flags {
 // Validate flag values.
 function validateFlags(flags: Flags) {
   if (flags.help) {
+    return;
+  }
+  if (flags.version) {
     return;
   }
   if (!flags.filepath) {
