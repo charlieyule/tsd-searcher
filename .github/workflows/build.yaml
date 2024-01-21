@@ -35,15 +35,15 @@ jobs:
         name: Set build env
         run: echo "BUILD_NAME=tsd-searcher-${{ github.ref_name }}-${{ matrix.platform.arch }}-${{ matrix.platform.tag }}" >> $Env:GITHUB_ENV
       - name: Compile
-        run: deno compile --allow-read --allow-write --no-check -o build/${{ env.BUILD_NAME }} --include worker.ts main.ts
+        run: deno task build
       - if: matrix.platform.tag != 'windows'
         name: Tar build
         working-directory: build
-        run: tar zcvf ${{ env.BUILD_NAME }}.tar.gz ${{ env.BUILD_NAME }}
+        run: tar zcvf ${{ env.BUILD_NAME }}.tar.gz tsd-searcher
       - if: matrix.platform.tag == 'windows'
         name: Tar build
         working-directory: build
-        run: tar zcvf ${{ env.BUILD_NAME }}.tar.gz ${{ env.BUILD_NAME }}.exe
+        run: tar zcvf ${{ env.BUILD_NAME }}.tar.gz tsd-searcher.exe
       - name: Upload build
         uses: actions/upload-artifact@v3
         with:
