@@ -55,6 +55,11 @@ if (import.meta.main) {
 
   const encoder = new TextEncoder();
   try {
+    output.write(
+      encoder.encode(
+        "> left_sequence left_start left_end right_sequence right_start right_end\n",
+      ),
+    );
     for await (
       const { seqId, tsds } of await searchFA(
         input.readable,
